@@ -14,16 +14,18 @@ public class EmployeePayrollService {
 	public EmployeePayrollService() {
 		employeePayrollDBService = EmployeePayrollDBService.getInstance();
 	}
+
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
 		this.employeePayrollList = employeePayrollList;
 	}
-	
+
 	public List<EmployeePayrollData> readEmployeePayrollData(IOService dbIo) {
 		if (dbIo.equals(IOService.DB_IO)) {
 			this.employeePayrollList = employeePayrollDBService.readData();
 		}
 		return this.employeePayrollList;
 	}
+
 	public void updateEmployeeSalary(String name, double salary) {
 		int result = employeePayrollDBService.updateEmployeeData(name, salary);
 		if (result == 0)
@@ -64,12 +66,17 @@ public class EmployeePayrollService {
 
 	public List<EmployeePayrollData> readEmployeePayrollForDateRange(IOService dbIo, LocalDate startDate,
 			LocalDate endDate) {
-		if(dbIo.equals(IOService.DB_IO)) {
-			return employeePayrollDBService.getEmployeeForGivenDateRange(startDate,endDate);
+		if (dbIo.equals(IOService.DB_IO)) {
+			return employeePayrollDBService.getEmployeeForGivenDateRange(startDate, endDate);
 		}
 		return null;
 	}
-	
-	
+
+	public Map<String, Double> readAverageSalaryByGender(IOService dbIo) {
+		if (dbIo.equals(IOService.DB_IO)) {
+			return employeePayrollDBService.getAverageSalaryByGender();
+		}
+		return null;
+	}
 
 }
