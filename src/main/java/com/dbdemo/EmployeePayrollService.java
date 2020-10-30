@@ -8,23 +8,23 @@ public class EmployeePayrollService {
 	};
 
 	private List<EmployeePayrollData> employeePayrollList;
+	private EmployeePayrollDBService employeePayrollDBService;
 
 	public EmployeePayrollService() {
+		employeePayrollDBService = EmployeePayrollDBService.getInstance();
 	}
-
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
 		this.employeePayrollList = employeePayrollList;
 	}
-
+	
 	public List<EmployeePayrollData> readEmployeePayrollData(IOService dbIo) {
 		if (dbIo.equals(IOService.DB_IO)) {
-			this.employeePayrollList = new EmployeePayrollDBService().readData();
+			this.employeePayrollList = employeePayrollDBService.readData();
 		}
 		return this.employeePayrollList;
 	}
-
 	public void updateEmployeeSalary(String name, double salary) {
-		int result = new EmployeePayrollDBService().updateEmployeeData(name, salary);
+		int result = employeePayrollDBService.updateEmployeeData(name, salary);
 		if (result == 0)
 			return;
 		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
@@ -41,14 +41,25 @@ public class EmployeePayrollService {
 		return null;
 	}
 
-	public boolean checkEmployeePayrollInSyncWithDB(String name) {
+	public boolean checkEmployeePayrollInSyncWithDB(String name, double salary) {
 		for (EmployeePayrollData data : employeePayrollList) {
 			if (data.getName().equals(name)) {
-				if (Double.compare(data.getSalary(), 3000000.00) == 0) {
+				if (Double.compare(data.getSalary(), salary) == 0) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
+
+	public void updateEmployeeSalaryUsingPrepareStatement(String name, double salary) {
+		int result = employeePayrollDBService.updateEmployeeDataUsingPreparedStatement(name, salary);
+		if (result == 0)
+			return;
+		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
+		if (employeePayrollData != null)
+			employeePayrollData.setSalary(salary);
+	}
+
+
 }
