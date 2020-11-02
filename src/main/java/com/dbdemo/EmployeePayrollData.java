@@ -3,11 +3,12 @@ package com.dbdemo;
 import java.time.LocalDate;
 
 public class EmployeePayrollData {
-	private int id;
-	private String name;
-	private double salary;
-	private LocalDate start;
-
+	int id;
+	String name;
+	double salary;
+	LocalDate start;
+	 String gender;
+	String department;
 	public int getId() {
 		return id;
 	}
@@ -41,6 +42,12 @@ public class EmployeePayrollData {
 	public EmployeePayrollData(int id, String name, double salary, LocalDate startDate) {
 		this(id, name, salary);
 		this.start = startDate;
+	}
+	public EmployeePayrollData(int id, String name, double salary, LocalDate startDate,String gender,String department) {
+		this(id, name, salary);
+		this.start = startDate;
+		this.gender=gender;
+		this.department=department;
 	}
 
 	public LocalDate getStart() {
