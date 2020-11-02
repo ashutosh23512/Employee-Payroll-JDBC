@@ -106,5 +106,21 @@ public class DBDemoTest {
 	    	List<EmployeePayrollData> employeePayrollData = empPayrollService.readEmployeePayrollData(IOService.DB_IO);
 	    	Assert.assertEquals(25, employeePayrollData.size());
 	    }
+	 @Test 
+	    public void given3Employees_WhenAdded_ShouldMatchEmpCountthreads() {
+	    	EmployeePayrollData[] empPayrollData = {
+	    			new EmployeePayrollData(53, "Jeff1", 60000.0, LocalDate.now(),"M","sales"),
+	    			new EmployeePayrollData(54, "Elon1", 70000.0, LocalDate.now(),"M","maketing"),
+	    			new EmployeePayrollData(55, "Tim1", 50000.0, LocalDate.now(),"M","HR")
+	    	};
+	    	EmployeePayrollService empPayrollService = new EmployeePayrollService();
+	    	empPayrollService.readEmployeePayrollData(IOService.DB_IO);
+	    	Instant start = Instant.now();
+	    	empPayrollService.addEmployeeToPayrollWithThreads(Arrays.asList(empPayrollData));
+	    	Instant end = Instant.now();
+	    	System.out.println("Duration without thread : " + Duration.between(start, end));
+	    	List<EmployeePayrollData> employeePayrollData = empPayrollService.readEmployeePayrollData(IOService.DB_IO);
+	    	Assert.assertEquals(28, employeePayrollData.size());
+	    }
 
 }

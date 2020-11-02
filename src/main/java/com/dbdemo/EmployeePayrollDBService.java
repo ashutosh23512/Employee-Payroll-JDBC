@@ -190,7 +190,7 @@ public class EmployeePayrollDBService {
 	}
 
 	public EmployeePayrollData addEmployeeToPayrollERDiagram(int id, String name, double salary, LocalDate startDate,
-			String gender, String Department,String phone,String address) {
+			String gender, String Department, String phone, String address) {
 		String sql = String.format(
 				"insert into employee_payroll (id,name,basic_pay,start,gender,department,deductions,taxable_pay,tax,net_pay) values (%s,'%s',%.2f,'%s','%s','%s',0.00,0.00,0.00,0.00);",
 				id, name, salary, startDate.toString(), gender, Department);
@@ -230,7 +230,9 @@ public class EmployeePayrollDBService {
 
 		int employeeId = 0;
 		try (Statement statement = this.getConnection().createStatement()) {
-			String sql2 = String.format("insert into employee (id,name,phone_number,gender,address) values (%s,'%s','%s','%s','%s');", id,name,phone,gender,address);
+			String sql2 = String.format(
+					"insert into employee (id,name,phone_number,gender,address) values (%s,'%s','%s','%s','%s');", id,
+					name, phone, gender, address);
 			int rowsAffected = statement.executeUpdate(sql2, statement.RETURN_GENERATED_KEYS);
 			if (rowsAffected == 1) {
 				ResultSet resultSet = statement.getGeneratedKeys();
@@ -239,11 +241,11 @@ public class EmployeePayrollDBService {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			
+
 		}
 		return employeePayrollData;
 	}
-	
+
 	public void removeEmployee(String name) {
 		int empId = -1;
 		EmployeePayrollData employeePayrollData = null;
@@ -263,14 +265,16 @@ public class EmployeePayrollDBService {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			
+
 		}
-		employeeId=34;
+		employeeId = 34;
 		try (Statement statement = this.getConnection().createStatement()) {
 			String sql = String.format("update employee_payroll set is_active = false where id = %s;", employeeId);
 			int rowsAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-}}
+
+	}
+
+}
