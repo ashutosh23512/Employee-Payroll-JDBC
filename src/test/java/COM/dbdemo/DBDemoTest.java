@@ -68,5 +68,14 @@ public class DBDemoTest {
 		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark", 5000000.00);
 		Assert.assertTrue(result);
 	}
+	
+	@Test
+	public void givenNewEmployee_WhenAddedToPayroll_ShouldSyncWityhDB() {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		employeePayrollService.addEmployeeToPayrollERDiagram(31,"Glen", 5000000.00, LocalDate.now(), "M","Sales","9888888888","50,Model Town");
+		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Glen", 5000000.00);
+		Assert.assertTrue(result);
+	}
 
 }
