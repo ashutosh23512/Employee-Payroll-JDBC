@@ -89,4 +89,8 @@ public class EmployeePayrollService {
 				startDate, gender,department,phone,address);
 		employeePayrollList.add(employeePayrollData);
 	}
+	
+	public void removeEmployee(String name) {
+		employeePayrollDBService.removeEmployee(name);
+	}
 }
