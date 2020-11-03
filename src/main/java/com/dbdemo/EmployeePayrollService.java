@@ -8,11 +8,15 @@ public class EmployeePayrollService {
 		DB_IO;
 	};
 
-	private List<EmployeePayrollData> employeePayrollList;
+	private static List<EmployeePayrollData> employeePayrollList;
 	private EmployeePayrollDBService employeePayrollDBService;
 
 	public EmployeePayrollService() {
 		employeePayrollDBService = EmployeePayrollDBService.getInstance();
+	}
+
+	public static long countEntries() {
+		return employeePayrollList.size();
 	}
 
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
@@ -42,6 +46,11 @@ public class EmployeePayrollService {
 			}
 		}
 		return null;
+	}
+
+	public void printEmployeeData(EmployeePayrollService.IOService ioService) {
+
+		System.out.println(employeePayrollList);
 	}
 
 	public boolean checkEmployeePayrollInSyncWithDB(String name, double salary) {
@@ -78,46 +87,55 @@ public class EmployeePayrollService {
 		}
 		return null;
 	}
-	
-	public void addEmployeeToPayroll(int id,String name, double salary, LocalDate startDate, String gender,String department) {
-		EmployeePayrollData employeePayrollData = employeePayrollDBService.addEmployee(id,name, salary, startDate, gender,department);
+
+	public void addEmployeeToPayroll(int id, String name, double salary, LocalDate startDate, String gender,
+			String department) {
+		EmployeePayrollData employeePayrollData = employeePayrollDBService.addEmployee(id, name, salary, startDate,
+				gender, department);
 		employeePayrollList.add(employeePayrollData);
 	}
-	
-	public void addEmployeeToPayrollERDiagram(int id,String name, double salary, LocalDate startDate, String gender,String department,String phone,String address) {
-		EmployeePayrollData employeePayrollData = employeePayrollDBService.addEmployeeToPayrollERDiagram(id,name, salary,
-				startDate, gender,department,phone,address);
+
+	public void addEmployeeToPayrollERDiagram(int id, String name, double salary, LocalDate startDate, String gender,
+			String department, String phone, String address) {
+		EmployeePayrollData employeePayrollData = employeePayrollDBService.addEmployeeToPayrollERDiagram(id, name,
+				salary, startDate, gender, department, phone, address);
 		employeePayrollList.add(employeePayrollData);
 	}
-	
+
 	public void removeEmployee(String name) {
 		employeePayrollDBService.removeEmployee(name);
 	}
+
 	public void addEmployeeToPayrollWithoutThreads(List<EmployeePayrollData> employeePayrollList) {
 		employeePayrollList.forEach(employeePayrollData -> {
 			System.out.println("Employee being added : " + employeePayrollData.name);
-			this.addEmployeeToPayroll(employeePayrollData.id,employeePayrollData.name, employeePayrollData.salary, employeePayrollData.start, employeePayrollData.gender,employeePayrollData.department);
+			this.addEmployeeToPayroll(employeePayrollData.id, employeePayrollData.name, employeePayrollData.salary,
+					employeePayrollData.start, employeePayrollData.gender, employeePayrollData.department);
 			System.out.println("Employee added : " + employeePayrollData.name);
 		});
 	}
-	
-	public void addEmployeeToPayrollWithThreads(List<EmployeePayrollData> employeePayrollList) {
-		Map<Integer, Boolean> empAdditionStatus = new HashMap<Integer, Boolean>();
-		employeePayrollList.forEach(employeePayrollData -> {
+
+	public void addEmployeesToPayrollWithThreads(List<EmployeePayrollData> employeePayrollDataList) {
+		Map<Integer, Boolean> employeeAdditionStatus = new HashMap<Integer, Boolean>();
+		employeePayrollDataList.forEach(employeePayrollData -> {
 			Runnable task = () -> {
-				empAdditionStatus.put(employeePayrollData.hashCode(), false);
-				
-				this.addEmployeeToPayroll(employeePayrollData.id,employeePayrollData.name, employeePayrollData.salary, employeePayrollData.start, employeePayrollData.gender,employeePayrollData.department);
-				empAdditionStatus.put(employeePayrollData.hashCode(), true);
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), false);
+				System.out.println("Employee Being Added: " + Thread.currentThread().getName());
+				this.addEmployeeToPayroll(employeePayrollData.id, employeePayrollData.name, employeePayrollData.salary,
+						employeePayrollData.start, employeePayrollData.gender, employeePayrollData.department);
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), true);
+				System.out.println("Employee Added: " + Thread.currentThread().getName());
 			};
-			Thread thread = new Thread(task, employeePayrollData.name);
+			Thread thread = new Thread(task, employeePayrollData.getName());
 			thread.start();
 		});
-		while(empAdditionStatus.containsValue(false)) {
+		while (employeeAdditionStatus.containsValue(false)) {
 			try {
 				Thread.sleep(10);
+			} catch (InterruptedException e) {
 			}
-			catch(InterruptedException e) {}
 		}
+		System.out.println(employeePayrollDataList);
 	}
+
 }
