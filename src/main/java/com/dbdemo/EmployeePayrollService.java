@@ -137,5 +137,27 @@ public class EmployeePayrollService {
 		}
 		System.out.println(employeePayrollDataList);
 	}
+	
+	public void addEmployeesToERDBWithThreads(List<EmployeePayrollData> employeePayrollDataList) {
+		Map<Integer, Boolean> employeeAdditionStatus = new HashMap<Integer, Boolean>();
+		employeePayrollDataList.forEach(employeePayrollData -> {
+			Runnable task = () -> {
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), false);
+				System.out.println("Employee Being Added: " + Thread.currentThread().getName());
+				this.addEmployeeToPayrollERDiagram(employeePayrollData.id, employeePayrollData.name, employeePayrollData.salary,
+						employeePayrollData.start, employeePayrollData.gender, employeePayrollData.department,employeePayrollData.phone,employeePayrollData.address);
+				System.out.println("Employee Added: " + Thread.currentThread().getName());
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), true);
+			};
+			Thread thread = new Thread(task, employeePayrollData.getName());
+			thread.start();
+		});
+		while (employeeAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+			}
+		}
+	}
 
 }

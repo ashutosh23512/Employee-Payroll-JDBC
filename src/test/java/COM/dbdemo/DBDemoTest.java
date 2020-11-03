@@ -128,5 +128,27 @@ public class DBDemoTest {
 		empPayrollService.printEmployeeData(IOService.DB_IO);
 		Assert.assertEquals(37, EmployeePayrollService.countEntries());
 	}
+	
+	@Test
+	public void given3Employees_WhenAddedToERDB_ShouldMatchEmployeeEntries() {
+		EmployeePayrollData[] arrayOfEmps = {
+				new EmployeePayrollData(56, "Jeff Bezos", 100000.0, LocalDate.now(), "M", "sales"),
+				new EmployeePayrollData(57, "Bill Gates", 200000.0, LocalDate.now(), "M", "maketing"),
+				new EmployeePayrollData(58, "Mark Zuckerberg", 300000.0, LocalDate.now(), "M", "HR"), };
+
+		EmployeePayrollService empPayrollService = new EmployeePayrollService();
+		empPayrollService.readEmployeePayrollData(IOService.DB_IO);
+		empPayrollService.printEmployeeData(IOService.DB_IO);
+		Instant start = Instant.now();
+		empPayrollService.addEmployeeToPayrollWithoutThreads(Arrays.asList(arrayOfEmps));
+		Instant end = Instant.now();
+		System.out.println("Duration without Thread: " + Duration.between(start, end));
+		Instant threadStart = Instant.now();
+		empPayrollService.addEmployeesToERDBWithThreads(Arrays.asList(arrayOfEmps));
+		Instant threadEnd = Instant.now();
+		System.out.println("Duration with Thread: " + Duration.between(threadStart, threadEnd));
+		empPayrollService.printEmployeeData(IOService.DB_IO);
+		Assert.assertEquals(37, EmployeePayrollService.countEntries());
+	}
 
 }
