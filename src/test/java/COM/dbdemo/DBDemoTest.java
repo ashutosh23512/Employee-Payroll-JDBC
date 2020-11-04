@@ -8,12 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.dbdemo.DBDemo;
 import com.dbdemo.EmployeePayrollData;
 import com.dbdemo.EmployeePayrollService;
 import com.dbdemo.EmployeePayrollService.IOService;
+import com.google.gson.Gson;
+
+import io.restassured.*;
+import io.restassured.response.Response;
 
 public class DBDemoTest {
 
@@ -150,26 +155,48 @@ public class DBDemoTest {
 //		empPayrollService.printEmployeeData(IOService.DB_IO);
 //		Assert.assertEquals(37, EmployeePayrollService.countEntries());
 //	}
+//
+//	@Test
+//	public void given3Employees_WhenUpdatedToERDB_ShouldMatchEmployeeEntries() {
+//		EmployeePayrollData[] arrayOfEmps = {
+//				new EmployeePayrollData(56, "Jeff Bezos", 900000.0, LocalDate.now(), "M", "sales"),
+//				new EmployeePayrollData(57, "Bill Gates", 900000.0, LocalDate.now(), "M", "maketing"),
+//				new EmployeePayrollData(58, "Mark Zuckerberg", 900000.0, LocalDate.now(), "M", "HR"), };
+//
+//		EmployeePayrollService empPayrollService = new EmployeePayrollService();
+//		empPayrollService.readEmployeePayrollData(IOService.DB_IO);
+//		Instant threadStart = Instant.now();
+//		empPayrollService.UpdateEmployeeDataInERDBWithThreads(Arrays.asList(arrayOfEmps));
+//		Instant threadEnd = Instant.now();
+//		System.out.println("Duration with Thread: " + Duration.between(threadStart, threadEnd));
+//		int totalUpdated = 0;
+//		for (EmployeePayrollData data : Arrays.asList(arrayOfEmps)) {
+//			boolean result = empPayrollService.checkEmployeePayrollInSyncWithDB(data.getName(), data.getSalary());
+//			if (result)
+//				totalUpdated++;
+//		}
+//		Assert.assertEquals(3, totalUpdated);
+//	}
+	@Before
+	public void Setup() {
+		RestAssured.baseURI = "http://localhost";
+		RestAssured.port = 3000;
+	}
 
 	@Test
-	public void given3Employees_WhenUpdatedToERDB_ShouldMatchEmployeeEntries() {
-		EmployeePayrollData[] arrayOfEmps = {
-				new EmployeePayrollData(56, "Jeff Bezos", 900000.0, LocalDate.now(), "M", "sales"),
-				new EmployeePayrollData(57, "Bill Gates", 900000.0, LocalDate.now(), "M", "maketing"),
-				new EmployeePayrollData(58, "Mark Zuckerberg", 900000.0, LocalDate.now(), "M", "HR"), };
-
-		EmployeePayrollService empPayrollService = new EmployeePayrollService();
-		empPayrollService.readEmployeePayrollData(IOService.DB_IO);
-		Instant threadStart = Instant.now();
-		empPayrollService.UpdateEmployeeDataInERDBWithThreads(Arrays.asList(arrayOfEmps));
-		Instant threadEnd = Instant.now();
-		System.out.println("Duration with Thread: " + Duration.between(threadStart, threadEnd));
-		int totalUpdated = 0;
-		for (EmployeePayrollData data : Arrays.asList(arrayOfEmps)) {
-			boolean result = empPayrollService.checkEmployeePayrollInSyncWithDB(data.getName(), data.getSalary());
-			if (result)
-				totalUpdated++;
-		}
-		Assert.assertEquals(3, totalUpdated);
+	public void givenEmployeeInJSONServer_whenRetrieved_ShouldMatchTheCount() {
+		EmployeePayrollData[] arrayOfEmps = getEmployeeList();
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmps));
+		long entries = employeePayrollService.countEntries();
+		Assert.assertEquals(2, entries);
 	}
+
+	private EmployeePayrollData[] getEmployeeList() {
+		Response response = RestAssured.get("/employees");
+		System.out.println("EMPLOYEE PAYROLL ENTRIES IN JSONServer:\n" + response.asString());
+		EmployeePayrollData[] arrayOfEmps = new Gson().fromJson(response.asString(), EmployeePayrollData[].class);
+		return arrayOfEmps;
+	}
+
+	
 }
