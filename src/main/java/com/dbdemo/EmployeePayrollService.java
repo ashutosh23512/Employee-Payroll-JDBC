@@ -20,7 +20,7 @@ public class EmployeePayrollService {
 	}
 
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
-		this.employeePayrollList = employeePayrollList;
+		this.employeePayrollList =new ArrayList<>(employeePayrollList);;
 	}
 
 	public List<EmployeePayrollData> readEmployeePayrollData(IOService dbIo) {
@@ -180,6 +180,13 @@ public class EmployeePayrollService {
 			} catch (InterruptedException e) {
 			}
 		}
+	}
+
+	
+
+	public void addEmployeeToPayroll(EmployeePayrollData employeePayrollData, IOService ioService) {
+
+		employeePayrollList.add(employeePayrollData);
 	}
 
 }

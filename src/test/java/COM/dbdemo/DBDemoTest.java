@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 
 import io.restassured.*;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 public class DBDemoTest {
 
@@ -196,6 +197,30 @@ public class DBDemoTest {
 		System.out.println("EMPLOYEE PAYROLL ENTRIES IN JSONServer:\n" + response.asString());
 		EmployeePayrollData[] arrayOfEmps = new Gson().fromJson(response.asString(), EmployeePayrollData[].class);
 		return arrayOfEmps;
+	}
+	
+	@Test
+	public void givenNewEmployee_WhenAdded_ShouldMatch201ResponseAndCount() {
+		EmployeePayrollService employeePayrollService;
+		EmployeePayrollData[] ArrayOfEmps = getEmployeeList();
+		employeePayrollService = new EmployeePayrollService(Arrays.asList(ArrayOfEmps));
+		EmployeePayrollData employeePayrollData = new EmployeePayrollData(0, "Mark Zukerberg", 300000,
+				LocalDate.now());
+		Response response = addEmployeeToJsonServer(employeePayrollData);
+		int statusCode = response.getStatusCode();
+		Assert.assertEquals(201, statusCode);
+		employeePayrollData = new Gson().fromJson(response.asString(), EmployeePayrollData.class);
+		employeePayrollService.addEmployeeToPayroll(employeePayrollData, IOService.REST_IO);
+		long entries = employeePayrollService.countEntries();
+		Assert.assertEquals(5, entries);
+	}
+
+	private Response addEmployeeToJsonServer(EmployeePayrollData employeePayrollData) {
+		String empJson = new Gson().toJson(employeePayrollData);
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		request.body(empJson);
+		return request.post("/employees");
 	}
 
 	
